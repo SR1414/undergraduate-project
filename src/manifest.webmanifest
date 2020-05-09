@@ -1,0 +1,10 @@
+{
+    "name": "Plan-IT Application",
+    "short_name": "Plan-IT",
+    "icons": [{
+        "src": "assets/icon.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }],
+    "display": "standalone"
+}
