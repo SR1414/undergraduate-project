@@ -10,6 +10,7 @@ app.use(cors());
 let Lesson = require('./models/lesson');
 let User = require('./models/user');
 let Calendar = require('./models/calendar');
+let Note = require('./models/note');
 
 mongoose.connect('mongodb://localhost/PlanIt', {
     useUnifiedTopology: true,
@@ -40,9 +41,6 @@ app.post('/getcalendar', (req, res) => {
         console.log(calendars)
         res.send(calendars);
     })
-});
-app.post('/test1', (req, res) => {
-    console.log(req.body.message);
 });
 app.post('/addcalendar', (req, res) => {
     var newcalendar = {
@@ -87,8 +85,50 @@ app.post('/deletecalendar', (req, res) => {
         if (err) return handleError(err);
     });
 });
-
-app.post('/test', (req, res) => {
+app.post('/getnotes', (req, res) => {
+    console.log(req.body.user)
+    var response = {
+        notes: "",
+        message: ""
+    };
+    Note.findOne({ user: req.body.user }, function (err, notes) {
+        response.message = "Got Notes";
+        response.notes = notes.notes
+        res.send(response);
+        if (err) return handleError(err);
+    });
+});
+app.post('/savenote', (req, res) => {
+    var response = {
+        message: ""
+    };
+    console.log(req.body.user)
+    var Email = req.body.user;
+    var notedetails = req.body.notedetails;
+    var LoggedNotes= {
+        user: Email,
+        notes: notedetails
+    };
+    Note.findOne({ email: req.body.email }, function (err, notes) {
+        if (!notes) {
+            const noteData = new Note(LoggedNotes);
+            noteData.save();
+            return;
+        }
+        Note.updateOne({ email: req.body.email }, {
+            $set: {
+                notes: notedetails
+            }
+        })
+            .catch(function (error, affect, resp) {
+                console.log("updated");
+            })
+        response.message = "Notes Saved";
+        res.send(response);
+        return;
+    })
+})
+app.post('/saveproject', (req, res) => {
     var response = {
         message: ""
     };

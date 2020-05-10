@@ -56,12 +56,9 @@
             <h3>Back Log</h3>
             <!-- Backlog draggable component. Pass arrBackLog to list prop -->
             <draggable class="list-group kanban-column" :list="arrBackLog" group="tasks">
-              <div
-                class="list-group-item"
-                v-for="element in arrBackLog"
-                :key="element.name"
-              >{{ element.name }}
-              <v-btn color="primary" class="mr-4" @click="ShowName(element)" dark>Show Note Name</v-btn>
+              <div class="list-group-item" v-for="element in arrBackLog" :key="element.name">
+                {{ element.name }}
+                <v-btn color="primary" class="mr-4" @click="ShowName(element)" dark>Show Note Name</v-btn>
               </div>
             </draggable>
           </div>
@@ -117,7 +114,7 @@
 <script>
 //import draggable
 import draggable from "vuedraggable";
-import json from './URL.json'
+import json from "./URL.json";
 //var URL = "https://1ec3dd63.ngrok.io";
 export default {
   name: "kanban-board",
@@ -184,7 +181,7 @@ export default {
         };
 
         console.log(sentProject);
-        fetch(this.URL + "/test", {
+        fetch(this.URL + "/saveproject", {
           method: "POST",
           // or 'PUT'
           headers: {
@@ -196,8 +193,14 @@ export default {
           .then(response => response.json())
           .then(data => {
             console.log("Success:", data);
+            alert(data);
             alert(data.message);
             this.checkIfLoggedIn();
+          })
+          .catch(error => {
+            if(error){
+              console.log("error");
+            }
           });
         return;
       }
@@ -223,6 +226,7 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
+          alert(data);
           if (data.project.length == 0) {
             alert("Project not found");
             return;
@@ -234,7 +238,7 @@ export default {
           this.arrDone = data.project.ProjectContents.Done;
         });
     },
-    ShowName(ev){
+    ShowName(ev) {
       console.log(JSON.parse(JSON.stringify(ev)));
     },
     checkIfLoggedIn: function() {
