@@ -55,7 +55,9 @@
 </template>
 
 <script>
+import json from './URL.json'
 //var URL = "https://1ec3dd63.ngrok.io";
+
 export default {
   name: "HelloWorld",
   props: {
@@ -68,6 +70,7 @@ export default {
       loginseen: true,
       LoggedInSeen: false,
       userinfo: "",
+      URL: json.URL,
       rules: [
         value => !!value || "Required.",
         value => (value && value.length >= 3) || "Min 3 characters"
@@ -86,7 +89,7 @@ export default {
         return;
       }
       console.log(logdata);
-      fetch("http://localhost:80/loguser", {
+      fetch(this.URL + "/loguser", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -125,7 +128,7 @@ export default {
       sessionStorage.removeItem("CurrentLoggedUser");
       this.loginseen = true;
       this.LoggedInSeen = false;
-    }
+    },
   },
   beforeMount() {
     this.checkIfLoggedIn();

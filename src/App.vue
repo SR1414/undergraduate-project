@@ -13,10 +13,10 @@
             <v-btn color="primary" @click="ShowNotes">Notes</v-btn>
             <v-btn color="primary" @click="ShowKaban">Project Board</v-btn>
             <v-btn color="primary" @click="ShowCalendar">Calendar</v-btn>
+            <v-btn color="primary" @click="detectMob">IsMobile</v-btn>
           </v-list-item-content>
         </v-list-item>
-        <v-card-actions>
-        </v-card-actions>
+        <v-card-actions></v-card-actions>
       </v-card>
       <!--<v-btn color="primary" @click="ShowLogin">Login</v-btn>
       <v-btn color="primary" @click="ShowRegister">Register</v-btn>
@@ -25,7 +25,7 @@
       <Login v-if="LoginSeen" msg="Welcome to Your Vue.js App" />
       <Register v-if="RegisterSeen" msg="Welcome to Your Vue.js App 2" />
       <Kaban v-if="KabanSeen" />
-      <Notes v-if="NotesSeen"/>
+      <Notes v-if="NotesSeen" />
       <Calendar v-if="CalendarSeen" />
     </div>
   </v-app>
@@ -37,8 +37,6 @@ import Register from "./components/Register.vue";
 import Kaban from "./components/Kaban.vue";
 import Calendar from "./components/Calendar";
 import Notes from "./components/Notes";
-
-
 
 export default {
   name: "App",
@@ -59,6 +57,22 @@ export default {
     Notes
   },
   methods: {
+    methods: {
+      detectMob: function() { 
+        console.log(navigator.userAgent);
+      },
+      isMobile() {
+        if (
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          )
+        ) {
+          alert("true");
+        } else {
+          alert("true");
+        }
+      }
+    },
     ShowLogin: function() {
       this.LoginSeen = true;
       this.RegisterSeen = false;

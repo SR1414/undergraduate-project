@@ -19,37 +19,43 @@
         <div class="notesbox">
           <div class="p-2 alert alert-secondary">
             <h3>Notes</h3>
-            <draggable class="list-group" :list="arrBacklog" group="tasks">
-              <div class="list-group-item" v-for="element in arrBacklog" :key="element.name">
-                {{ element.name }}
-                <v-btn
-                  color="red"
-                  class="mr-4"
-                  @click="DeleteNote(element)"
-                  dark
-                >
-                <v-icon>mdi-delete</v-icon>
+            <div class="list-group" :list="arrBacklog" group="tasks">
+              <div class="list-group-item" v-for="element in arrBacklog" :key="element.ID">
+                <div v-if="dialog == false">{{ element.name }}</div>
+                <div v-if="dialog">
+                  <v-textarea v-model="element.name"  outlined name="input-7-4"></v-textarea>
+                  <v-btn color="green" class="mr-4" @click="SaveNote(selectednote)" dark>
+                    Save
                 </v-btn>
-                <v-btn color="primary" class="mr-5" @click="dialog = true" dark>
+                </div>
+                <v-btn v-if="dialog == false" color="red" class="mr-4" @click="DeleteNote(element)" dark>
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+                <v-btn v-if="dialog == false" color="primary" class="mr-5" @click="editnote(element)" dark>
                   <v-icon>mdi-pencil</v-icon>
-                  </v-btn>
-                <v-dialog v-model="dialog" max-width="500">
+                </v-btn>
+
+                <!--<v-dialog v-model="dialog" max-width="500">
                   <v-card>
                     <v-container>
                       <v-form>
-                        <div>{{ element.name }}</div>
+                        <v-textarea
+                          name="input-7-1"
+                          color="gray"
+                          label="Note"
+                          v-model="selectednote.name"
+                        ></v-textarea>
                         <v-btn
-                          type="submit"
                           color="primary"
-                          class="mr-4"
-                          @click.stop="dialog = false"
-                        >create event</v-btn>
+                          class="createnote"
+                          @click="SaveNote(selectednote.name)"
+                        >Save Note</v-btn>
                       </v-form>
                     </v-container>
                   </v-card>
-                </v-dialog>
+                </v-dialog>-->
               </div>
-            </draggable>
+            </div>
           </div>
         </div>
       </div>
@@ -58,32 +64,49 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+//import draggable from "vuedraggable";
+import json from "./URL.json";
 export default {
   name: "App",
   components: {
-    draggable
+    //draggable
   },
   data() {
     return {
       notename: "",
       notedetails: "",
       arrBacklog: [],
-      dialog: false
+      dialog: false,
+      selectednote: [],
+      URL: json.URL
     };
   },
   methods: {
+    genRandID(length) {
+      var tmp = "";
+      var availChars = "abcdefghijklmopqrstuvwxyz123456789";
+      for (var i = 0; i < length; i++)
+        tmp += availChars.charAt(Math.floor(Math.random() * availChars.length));
+      return tmp;
+    },
     add() {
       if (this.notename) {
-        this.arrBacklog.push({ name: this.notename });
+        this.arrBacklog.push({ 
+          name: this.notename,
+          ID: this.genRandID(12)
+         });
         this.notename = "";
         console.log("hello");
       }
     },
+    SaveNote(ev) {
+      console.log(ev);
+      this.dialog = false;
+    },
     DeleteNote(ev) {
       //console.log(JSON.parse(JSON.stringify(ev)));
       var event = ev;
-      var aarray = this.arrBacklog
+      var aarray = this.arrBacklog;
       //console.log(array.length)
       for (var i = 0; i < aarray.length; i++) {
         if (aarray[i].name == event.name) {
@@ -92,14 +115,17 @@ export default {
           console.log(JSON.parse(JSON.stringify(this.arrBacklog)));
           break;
         }
-        
       }
+    },
+    editnote(ev) {
+      this.selectednote = ev;
+      this.dialog = true;
     },
     Test() {
       var data = {
         message: "hello"
-      }
-      fetch("http://localhost:80/test1", {
+      };
+      fetch(this.URL + "/test1", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -125,22 +151,21 @@ export default {
   display: inline-block;
 }
 .mr-4 {
-   border: none;
+  border: none;
   text-align: right;
   font-size: 15px;
   padding: 10px;
   margin: 5px;
-  float: right;
+  float: bottom;
   display: block;
 }
 .mr-5 {
-   border: none;
+  border: none;
   text-align: right;
   font-size: 15px;
   padding: 10px;
   margin: 5px;
-  float: right;
+  float: bottom;
   display: block;
 }
-
 </style>

@@ -61,6 +61,7 @@
 
 <script>
 //var URL = "https://1ec3dd63.ngrok.io";
+import json from './URL.json'
 export default {
   name: "HelloWorld",
   props: {
@@ -75,7 +76,8 @@ export default {
       rules: [
         value => !!value || "Required.",
         value => (value && value.length >= 3) || "Min 3 characters"
-      ]
+      ],
+      URL: json.URL
     };
   },
   methods: {
@@ -91,7 +93,7 @@ export default {
         return;
       }
       //asks server for list of users and checks if it is empty or not
-      fetch("http://localhost:80/newuser", {
+      fetch(this.URL + "/newuser", {
         method: "POST",
         // or 'PUT'
         headers: {

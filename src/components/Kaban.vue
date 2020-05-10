@@ -117,6 +117,7 @@
 <script>
 //import draggable
 import draggable from "vuedraggable";
+import json from './URL.json'
 //var URL = "https://1ec3dd63.ngrok.io";
 export default {
   name: "kanban-board",
@@ -143,7 +144,8 @@ export default {
       rules: [
         value => !!value || "Required.",
         value => (value && value.length >= 3) || "Min 3 characters"
-      ]
+      ],
+      URL: json.URL
     };
   },
   methods: {
@@ -182,7 +184,7 @@ export default {
         };
 
         console.log(sentProject);
-        fetch("http://localhost:80/test", {
+        fetch(this.URL + "/test", {
           method: "POST",
           // or 'PUT'
           headers: {
@@ -210,7 +212,7 @@ export default {
         email: this.userinfo.email
       };
 
-      fetch("http://localhost:80/loadproject", {
+      fetch(this.URL + "/loadproject", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -248,7 +250,7 @@ export default {
         this.userinfo = loggeduser;
         this.kabanseen = true;
         this.signseen = false;
-        fetch("http://localhost:80/getprojectnames", {
+        fetch(this.URL + "/getprojectnames", {
           method: "POST",
           // or 'PUT'
           headers: {

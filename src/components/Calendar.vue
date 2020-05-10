@@ -81,6 +81,7 @@
             offset-x
           >
             <v-card color="grey lighten-4" min-width="350px" flat>
+              hello
               <v-toolbar :color="selectedEvent.color" dark>
                 <v-btn @click="deleteEvent(selectedEvent.id)" icon>
                   <v-icon>mdi-delete</v-icon>
@@ -118,8 +119,9 @@
 </template>
 
 <script>
-//import { db } from "@/main";
 //var URL = "https://1ec3dd63.ngrok.io";
+import json from './URL.json'
+
 export default {
   data: () => ({
     today: new Date().toISOString().substring(0, 10),
@@ -144,7 +146,8 @@ export default {
     dialog: false,
     calendarseen: false,
     calendarsignseen: true,
-    userinfo: ""
+    userinfo: "",
+    URL: json.URL
   }),
   computed: {
     title() {
@@ -199,7 +202,7 @@ export default {
         lastname: i.lastname
       };
       console.log(loggeduser.email);
-      await fetch("http://localhost:80/getcalendar", {
+      await fetch(this.URL + "/getcalendar", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -231,7 +234,7 @@ export default {
           end: this.end,
           color: this.color
         };
-        await fetch("http://localhost:80/addcalendar", {
+        await fetch(this.URL + "/addcalendar", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -267,7 +270,7 @@ export default {
         selectedcalendar: this.currentlyEditing,
         update: event.details
       };
-      await fetch("http://localhost:80/updatecalendar", {
+      await fetch(this.URL + "/updatecalendar", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -293,7 +296,7 @@ export default {
         user: this.userinfo.email,
         ToDelete: event
       };
-      await fetch("http://localhost:80/deletecalendar", {
+      await fetch(this.URL + "/deletecalendar", {
         method: "POST",
         // or 'PUT'
         headers: {
