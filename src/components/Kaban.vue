@@ -1,9 +1,12 @@
 <template>
 <v-app>
   <body class="container">
+    <!--------------------------------DISPLAYS THIS DIV IF THE USER IS NOT LOGGED IN------------------------------------------------->
     <div v-if="signseen">
       <h1 class="signhead">Sign in to create Kaban Board</h1>
     </div>
+    <!--------------------------------------------------------------------------------->
+    <!-----------------------------------HERE IS WHERE THE USERS LIST OF PROJECTS ARE DISPLAYED---------------------------------------------->
     <div v-if="kabanseen" class="container mt-5">
       <div v-if="render">
         <h2>Your Projects:</h2>
@@ -14,13 +17,8 @@
           >{{ index }} - Project Name: {{ userprojectsname }}</li>
         </ul>
       </div>
-      <div>
-        <!--<input placeholder="Enter Project Name" v-model="loadname" />
-      <b-button @click="load" class="ml-3">Load Project</b-button>
-      <br />
-      <input placeholder="Save Project As:" v-model="savename" />
-        <b-button @click="save" class="ml-3">Save Project</b-button>-->
-      </div>
+      <!--------------------------------------------------------------------------------->
+      <!------------------------HERE ARE WHERE THE INPUTS ARE KEPT---------------------------------->
       <div class="row form-inline">
         <b-form-input
           id="input-2"
@@ -50,6 +48,7 @@
           <v-btn color="primary" @click="add" class="ml-3">Add Task</v-btn>
         </div>
       </div>
+      <!--------------------------------------------------------------------------------->
       <div class="row mt-5">
         <div class="col-3">
           <div class="p-2 alert alert-secondary">
@@ -282,7 +281,7 @@ export default {
 <style>
 /* light stylings for the kanban columns */
 .kanban-column {
-  min-height: 300px;
+  min-height: 500px;
 }
 .container {
   background-color: #1f6aa9;

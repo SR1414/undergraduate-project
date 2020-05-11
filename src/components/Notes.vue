@@ -3,15 +3,18 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col form-inline">
-          <b-form-input
+          <v-textarea
             id="input-2"
             v-model="notename"
             required
-            placeholder="Enter Task"
+            background-color="white"
+            placeholder="Add Note"
+            outlined
+            maxlength="500"
+            color="white"
             @keyup.enter="add"
-          ></b-form-input>
-          <v-btn color="primary" @click="add" class="ml-3">Add Task</v-btn>
-          <v-btn color="primary" @click="Test" class="ml-3">Add Task</v-btn>
+          ></v-textarea>
+          <v-btn color="primary" @click="add" class="ml-3">Add Note</v-btn>
         </div>
       </div>
 
@@ -44,25 +47,6 @@
                 >
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-                <!--<v-dialog v-model="dialog" max-width="500">
-                  <v-card>
-                    <v-container>
-                      <v-form>
-                        <v-textarea
-                          name="input-7-1"
-                          color="gray"
-                          label="Note"
-                          v-model="selectednote.name"
-                        ></v-textarea>
-                        <v-btn
-                          color="primary"
-                          class="createnote"
-                          @click="SaveNote(selectednote.name)"
-                        >Save Note</v-btn>
-                      </v-form>
-                    </v-container>
-                  </v-card>
-                </v-dialog>-->
               </div>
             </div>
           </div>
@@ -73,8 +57,10 @@
 </template>
 
 <script>
-//import draggable from "vuedraggable";
 import json from "./URL.json";
+
+
+
 export default {
   name: "App",
   components: {
@@ -107,7 +93,7 @@ export default {
       var serversend = {
         user: this.userinfo.email
       };
-      await fetch(this.URL + "/getnotes", {
+      fetch(this.URL + "/getnotes", {
         method: "POST",
         // or 'PUT'
         headers: {
@@ -117,10 +103,15 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
-          console.log(JSON.parse(JSON.stringify(data.message)));
-          console.log(JSON.parse(JSON.stringify(data.notes)));
-          this.arrBacklog = data.notes;
-          //events.push(data);
+          if(data.notes.length == 0){
+            console.log(data.message);
+            
+          }
+          if(!data.notes.length == 0){
+            console.log(data.message);
+            this.arrBacklog = data.notes;
+          }
+          
         });
     },
     add() {

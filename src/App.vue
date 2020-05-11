@@ -13,7 +13,7 @@
             <v-btn color="primary" @click="ShowNotes">Notes</v-btn>
             <v-btn color="primary" @click="ShowKaban">Project Board</v-btn>
             <v-btn color="primary" @click="ShowCalendar">Calendar</v-btn>
-            <v-btn color="primary" @click="detectMob">IsMobile</v-btn>
+            <v-btn color="primary" @click="ShowTodo">Todo</v-btn>
           </v-list-item-content>
         </v-list-item>
         <v-card-actions></v-card-actions>
@@ -27,6 +27,7 @@
       <Kaban v-if="KabanSeen" />
       <Notes v-if="NotesSeen" />
       <Calendar v-if="CalendarSeen" />
+      <Todo v-if="TodoSeen"/>
     </div>
   </v-app>
 </template>
@@ -37,7 +38,8 @@ import Register from "./components/Register.vue";
 import Kaban from "./components/Kaban.vue";
 import Calendar from "./components/Calendar";
 import Notes from "./components/Notes";
-
+import Todo from "./components/Todo";
+import json from './components/URL.json'
 export default {
   name: "App",
   data() {
@@ -46,7 +48,10 @@ export default {
       RegisterSeen: false,
       KabanSeen: false,
       CalendarSeen: false,
-      NotesSeen: false
+      NotesSeen: false,
+      TodoSeen: false,
+      userinfo:"",
+      URL: json.URL
     };
   },
   components: {
@@ -54,23 +59,22 @@ export default {
     Register,
     Kaban,
     Calendar,
-    Notes
+    Notes,
+    Todo
+  },
+  beforeMount() {
+    this.checkIfLoggedIn();
   },
   methods: {
-    methods: {
-      detectMob: function() { 
-        console.log(navigator.userAgent);
-      },
-      isMobile() {
-        if (
-          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-          )
-        ) {
-          alert("true");
-        } else {
-          alert("true");
-        }
+    checkIfLoggedIn: function() {
+      if (sessionStorage.getItem("CurrentLoggedUser")) {
+        var i = JSON.parse(sessionStorage.getItem("CurrentLoggedUser"));
+        var loggeduser = {
+          email: i.email,
+          firstname: i.firstname,
+          lastname: i.lastname
+        };
+        this.userinfo = loggeduser;
       }
     },
     ShowLogin: function() {
@@ -79,6 +83,7 @@ export default {
       this.KabanSeen = false;
       this.CalendarSeen = false;
       this.NotesSeen = false;
+      this.TodoSeen = false;
     },
     ShowRegister: function() {
       this.LoginSeen = false;
@@ -86,6 +91,7 @@ export default {
       this.KabanSeen = false;
       this.CalendarSeen = false;
       this.NotesSeen = false;
+      this.TodoSeen = false;
     },
     ShowKaban: function() {
       this.LoginSeen = false;
@@ -93,6 +99,7 @@ export default {
       this.KabanSeen = true;
       this.CalendarSeen = false;
       this.NotesSeen = false;
+      this.TodoSeen = false;
     },
     ShowCalendar: function() {
       this.LoginSeen = false;
@@ -100,6 +107,7 @@ export default {
       this.KabanSeen = false;
       this.CalendarSeen = true;
       this.NotesSeen = false;
+      this.TodoSeen = false;
     },
     ShowNotes: function() {
       this.LoginSeen = false;
@@ -107,7 +115,17 @@ export default {
       this.KabanSeen = false;
       this.CalendarSeen = false;
       this.NotesSeen = true;
-    }
+      this.TodoSeen = false;
+    },
+    ShowTodo: function() {
+      this.LoginSeen = false;
+      this.RegisterSeen = false;
+      this.KabanSeen = false;
+      this.CalendarSeen = false;
+      this.NotesSeen = false;
+      this.TodoSeen = true;
+    },
+    
   }
 };
 </script>

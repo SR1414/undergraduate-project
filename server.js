@@ -11,6 +11,7 @@ let Lesson = require('./models/lesson');
 let User = require('./models/user');
 let Calendar = require('./models/calendar');
 let Note = require('./models/note');
+let ToDo = require('./models/todo');
 
 mongoose.connect('mongodb://localhost/PlanIt', {
     useUnifiedTopology: true,
@@ -60,6 +61,67 @@ app.post('/addcalendar', (req, res) => {
     response.message = "Appointment Saved";
     res.send(response);
 });
+app.post('/savetodo', (req, res) => {
+    var response = {
+        message: ""
+    };
+    console.log(req.body)
+    var Email = req.body.user;
+    var tododetails = req.body.todo;
+    var LoggedTodo = {
+        user: Email,
+        todo: tododetails
+    };
+    console.log(req.body.user)
+    ToDo.findOne({ user: req.body.user }, function (err, todos) {
+        if (todos) {
+            ToDo.updateOne({ user: req.body.user }, {
+                $set: {
+                    todo: tododetails
+                }
+            })
+                .catch(function (error, affect, resp) {
+                    console.log("updated");
+                })
+            response.message = "Todo Saved";
+            res.send(response);
+            return;
+        }
+        if (!todos == true) {
+            const ToDoData = new ToDo(LoggedTodo);
+            ToDoData.save();
+            return;
+        }
+
+
+    })
+});
+
+app.post('/gettodo', (req, res) => {
+    console.log(req.body.user)
+    var response = {
+        todo: "",
+        message: ""
+    };
+    ToDo.findOne({ user: req.body.user }, function (err, todos) {
+        if (todos) {
+            response.message = "Got Notes";
+            response.todo = todos.todo
+            console.log(todos);
+            res.send(response);
+            if (err) return handleError(err);
+            return;
+        }
+        if (!todos == true) {
+            response.message = "No Notes";
+            console.log("user has no notes");
+            res.send(response)
+            return;
+        }
+
+    });
+});
+
 app.post('/updatecalendar', (req, res) => {
 
     var response = {
@@ -92,10 +154,21 @@ app.post('/getnotes', (req, res) => {
         message: ""
     };
     Note.findOne({ user: req.body.user }, function (err, notes) {
-        response.message = "Got Notes";
-        response.notes = notes.notes
-        res.send(response);
-        if (err) return handleError(err);
+        if (notes) {
+            response.message = "Got Notes";
+            response.notes = notes.notes
+            console.log(notes);
+            res.send(response);
+            if (err) return handleError(err);
+            return;
+        }
+        if (!notes) {
+            response.message = "No Notes";
+            console.log("user has no notes");
+            res.send(response)
+            return;
+        }
+
     });
 });
 app.post('/savenote', (req, res) => {
@@ -105,27 +178,33 @@ app.post('/savenote', (req, res) => {
     console.log(req.body.user)
     var Email = req.body.user;
     var notedetails = req.body.notedetails;
-    var LoggedNotes= {
+    var LoggedNotes = {
         user: Email,
         notes: notedetails
     };
-    Note.findOne({ email: req.body.email }, function (err, notes) {
-        if (!notes) {
+    console.log(req.body.user)
+    Note.findOne({ user: req.body.user }, function (err, notes) {
+        console.log(notes);
+        if (notes) {
+            Note.updateOne({ user: req.body.user }, {
+                $set: {
+                    notes: notedetails
+                }
+            })
+                .catch(function (error, affect, resp) {
+                    console.log("updated");
+                })
+            response.message = "Notes Saved";
+            res.send(response);
+            return;
+        }
+        if (!notes == true) {
             const noteData = new Note(LoggedNotes);
             noteData.save();
             return;
         }
-        Note.updateOne({ email: req.body.email }, {
-            $set: {
-                notes: notedetails
-            }
-        })
-            .catch(function (error, affect, resp) {
-                console.log("updated");
-            })
-        response.message = "Notes Saved";
-        res.send(response);
-        return;
+
+
     })
 })
 app.post('/saveproject', (req, res) => {

@@ -86,7 +86,10 @@ export default {
         email: this.email,
         firstname: this.firstname,
         lastname: this.lastname,
-        password: this.password
+        password: this.password,
+        notes: [],
+        projects: [],
+        calendars: []
       };
       if (!this.email || !this.firstname || !this.lastname || !this.password) {
         alert("Ensure all fields are filled in with valid information");

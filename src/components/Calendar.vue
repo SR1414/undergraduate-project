@@ -5,6 +5,7 @@
     </div>
     <v-row v-if="calendarseen" class="fill-height">
       <v-col>
+        <!-------------------------------------TOP OF THE CALENDAR--------------------------------------------------------->
         <v-sheet height="64">
           <v-toolbar flat color="white">
             <v-btn color="primary" class="mr-4" @click="dialog = true" dark>Add Event</v-btn>
@@ -41,6 +42,8 @@
             </v-menu>
           </v-toolbar>
         </v-sheet>
+        <!---------------------------------------------------------------------------------------------->
+        <!-------------------------------DIALOG BOX for creating an appointment on the calendar---------------------------------------------->
         <v-dialog v-model="dialog" max-width="500">
           <v-card>
             <v-container>
@@ -61,6 +64,7 @@
           </v-card>
         </v-dialog>
         <v-sheet height="600">
+          <!--------------------------------Vueify componenet that shows the caledar-------------------------------------------------->
           <v-calendar
             ref="calendar"
             v-model="focus"
@@ -74,14 +78,14 @@
             @click:date="viewDay"
             @change="updateRange"
           ></v-calendar>
+          <!---------------------------------------------------------------------------------------------->
+          <!-----------------------------------------POPUP BOX that displays appointment and Options----------------------------------------------------->
           <v-menu
             v-model="selectedOpen"
             :close-on-content-click="false"
             :activator="selectedElement"
-            offset-x
-          >
+            offset-x>
             <v-card color="grey lighten-4" min-width="350px" flat>
-              hello
               <v-toolbar :color="selectedEvent.color" dark>
                 <v-btn @click="deleteEvent(selectedEvent.id)" icon>
                   <v-icon>mdi-delete</v-icon>
@@ -112,6 +116,7 @@
               </v-card-actions>
             </v-card>
           </v-menu>
+          <!---------------------------------------------------------------------------------------------->
         </v-sheet>
       </v-col>
     </v-row>
@@ -121,6 +126,7 @@
 <script>
 //var URL = "https://1ec3dd63.ngrok.io";
 import json from './URL.json'
+
 
 export default {
   data: () => ({
@@ -155,7 +161,6 @@ export default {
       if (!start || !end) {
         return "";
       }
-
       const startMonth = this.monthFormatter(start);
       const endMonth = this.monthFormatter(end);
       const suffixMonth = startMonth === endMonth ? "" : endMonth;
@@ -178,6 +183,7 @@ export default {
       }
       return "";
     },
+    /*    CHANGES HOW THE CALENDAR IS FORMATED           */
     monthFormatter() {
       return this.$refs.calendar.getFormatter({
         timeZone: "UTC",
@@ -185,13 +191,14 @@ export default {
       });
     }
   },
-
+  /*    BEFORE ANYTHING THE APP CHECK IF THE USER IS LOGGED IN AND RETRIEVES APPOINTMENTS       */
   mounted() {
     this.getEvents();
     this.checkIfLoggedIn();
     this.$refs.calendar.checkChange();
   },
   methods: {
+    /*    SENDS A REQUEST TO THE SERVER THAT WILL SEND THE USERS APPOINTMENTS BACK USING FETCH       */
     async getEvents() {
       //var snapshot = await db.collection("calEvent").get();
       //var events = [];
@@ -224,6 +231,7 @@ export default {
       //});
       //console.log(JSON.parse(JSON.stringify(this.events)))
     },
+    /*    CREATES A NEW EVENT AND THEN SENDS IT TO THE SERVER TO BE ADDED TO THE DATABASE       */
     async addEvent() {
       if (this.name && this.start && this.end) {
         var data = {
@@ -258,6 +266,7 @@ export default {
         alert("Name, Start and End Date are required");
       }
     },
+    /*    CHANGES TO EXISTING APPOINTMENTS ARE SEND TO THE SERVER TO UPDATE THE DATABASE       */
     async updateEvent(event) {
       //await db
       //.collection("calEvent")
@@ -287,6 +296,7 @@ export default {
       this.currentlyEditing = null;
       this.getEvents();
     },
+    /*    SENDS THE APPOINTMENTS ID TO THE SERVER TO DELETE IN THE DATABASE       */
     async deleteEvent(event) {
       //await db
       //.collection("calEvent")
@@ -311,6 +321,7 @@ export default {
       this.selectedOpen = false;
       this.getEvents();
     },
+    /*    USING A MENU OPTION, IT CHANGES THE CALENDAR TO JUST DISPLAY THE DAY AND ITS APPOINTMENTS       */
     viewDay({ date }) {
       this.focus = date;
       this.type = "day";
@@ -387,6 +398,7 @@ export default {
             1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
         : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`;
     },
+    /*    CHECKS IF THE USER IS LOGGED IN BY CHECKING SESSION STORAGE, IF NOT THEN THE CALENDAR WILL BE HIDDEN AND A DIV WILL SHOW TELLING THE USER TO LOG IN       */
     checkIfLoggedIn: function() {
       if (sessionStorage.getItem("CurrentLoggedUser")) {
         this.loginseen = false;
