@@ -1,6 +1,6 @@
 <template>
-<v-app>
-  <body class="container">
+<v-app v-if="todoseen">
+  <body class="container" >
     <div width="90vh" height="90vh">
       <v-text-field
         background-color="white"
@@ -52,8 +52,8 @@
               type="checkbox"
               :label="'Check All'"
               :checked="!anyRemaining"
-              @change="SaveNote"
               @click="checkAllTodos"
+              @change="SaveNote"
             ></v-checkbox>
             <h4>{{ remaining }} items left</h4>
           </label>
@@ -82,7 +82,7 @@
               v-if="showremovefinishedButton"
               @click="removefinished"
               color="secondary"
-            >Completed</v-btn>
+            >Clear Completed</v-btn>
           </transition>
         </div>
       </div>
@@ -101,22 +101,10 @@ export default {
       idForTodo: 3,
       beforeEditCache: "",
       filter: "all",
-      todos: [
-        {
-          id: 1,
-          title: "Finish Vue Screencast",
-          completed: false,
-          editing: false
-        },
-        {
-          id: 2,
-          title: "Take over world",
-          completed: false,
-          editing: false
-        }
-      ],
+      todos: [],
       userinfo: "",
-      URL: json.URL
+      URL: json.URL,
+      todoseen: false
     };
   },
   beforeMount() {
@@ -254,9 +242,11 @@ export default {
     },
     removefinished() {
       this.todos = this.todos.filter(todo => !todo.completed);
-      this.SaveNote();
     },
     checkIfLoggedIn: function() {
+      if(!sessionStorage.getItem("CurrentLoggedUser")){
+        alert("Sign In!")
+      }
       if (sessionStorage.getItem("CurrentLoggedUser")) {
         var i = JSON.parse(sessionStorage.getItem("CurrentLoggedUser"));
         var loggeduser = {
@@ -265,6 +255,7 @@ export default {
           lastname: i.lastname
         };
         this.userinfo = loggeduser;
+        this.todoseen = true;
       }
     },
     getTodos() {
@@ -282,7 +273,11 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
-          this.todos = data.todo;
+          console.log(data.todo.length)
+          if(data.todo.length !== 0){
+            this.todos = data.todo;
+          }
+          
         });
     }
   }

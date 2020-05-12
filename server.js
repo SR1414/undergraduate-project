@@ -7,7 +7,7 @@ const cors = require('cors');
 app.use(cors());
 
 //bring in models
-let Lesson = require('./models/lesson');
+let Project = require('./models/project');
 let User = require('./models/user');
 let Calendar = require('./models/calendar');
 let Note = require('./models/note');
@@ -100,7 +100,7 @@ app.post('/savetodo', (req, res) => {
 app.post('/gettodo', (req, res) => {
     console.log(req.body.user)
     var response = {
-        todo: "",
+        todo: [],
         message: ""
     };
     ToDo.findOne({ user: req.body.user }, function (err, todos) {
@@ -221,20 +221,20 @@ app.post('/saveproject', (req, res) => {
             ProjectContents: ProjectContents
         }]
     };
-    Lesson.findOne({ email: req.body.Email }, function (err, lessons) {
-        if (!lessons) {
-            const lessonData = new Lesson(LoggedProject);
-            lessonData.save();
+    Project.findOne({ email: req.body.Email }, function (err, projects) {
+        if (!projects) {
+            const projectData = new Project(LoggedProject);
+            projectData.save();
             return;
         }
         var i;
-        for (i = 0; i < lessons.Projects.length; i++) {
+        for (i = 0; i < projects.Projects.length; i++) {
             //console.log("hello")
-            if (lessons.Projects[i].ProjectName == req.body.ProjectName) {
-                lessons.Projects[i].ProjectContents = req.body.ProjectContents
-                var updateProject = lessons.Projects;
+            if (projects.Projects[i].ProjectName == req.body.ProjectName) {
+                projects.Projects[i].ProjectContents = req.body.ProjectContents
+                var updateProject = projects.Projects;
                 //console.log(updateProject);
-                Lesson.updateOne({ email: req.body.Email }, {
+                Project.updateOne({ email: req.body.Email }, {
                     $set: {
                         Projects: updateProject
                     }
@@ -248,11 +248,11 @@ app.post('/saveproject', (req, res) => {
                 return;
             }
         }
-        var test = lessons;
+        var test = projects;
         test.Projects.push(LoggedProject.Projects[0]);
         console.log(test);
         console.log(updateProject);
-        Lesson.updateOne({ email: req.body.Email }, {
+        Project.updateOne({ email: req.body.Email }, {
             $set: {
                 Projects: test.Projects
             }
@@ -271,17 +271,17 @@ app.post('/loadproject', (req, res) => {
         message: "",
         project: ""
     }
-    Lesson.findOne({ email: req.body.email }, function (err, lessons) {
-        if (!lessons) {
+    Project.findOne({ email: req.body.email }, function (err, projects) {
+        if (!projects) {
             res.send(response)
             return;
         }
         var i;
-        for (i = 0; i < lessons.Projects.length; i++) {
-            if (lessons.Projects[i].ProjectName == req.body.projectname) {
+        for (i = 0; i < projects.Projects.length; i++) {
+            if (projects.Projects[i].ProjectName == req.body.projectname) {
                 response.project = {
-                    ProjectName: lessons.Projects[i].ProjectName,
-                    ProjectContents: lessons.Projects[i].ProjectContents
+                    ProjectName: projects.Projects[i].ProjectName,
+                    ProjectContents: projects.Projects[i].ProjectContents
                 };
                 response.message = "Project Loaded";
                 res.send(response);
@@ -295,15 +295,15 @@ app.post('/getprojectnames', (req, res) => {
         message: "",
         projectnames: new Array
     }
-    Lesson.findOne({ email: req.body.email }, function (err, lessons) {
+    Project.findOne({ email: req.body.email }, function (err, projects) {
         var i;
-        if (!lessons) {
+        if (!projects) {
             res.send(response);
             return;
         }
-        for (i = 0; i < lessons.Projects.length; i++) {
-            //console.log(lessons.Projects[i].ProjectName);
-            response.projectnames.push(lessons.Projects[i].ProjectName);
+        for (i = 0; i < projects.Projects.length; i++) {
+            //console.log(projects.Projects[i].ProjectName);
+            response.projectnames.push(projects.Projects[i].ProjectName);
 
         }
         console.log(response.projectnames);
@@ -328,27 +328,27 @@ app.get('/check', (req, res) => {
     res.send(hello);
 })
 
-app.get('/lessons', (req, res) => {
+app.get('/projects', (req, res) => {
     console.log("hello")
-    Lesson.find({}, function (err, lessons) {
-        console.log(lessons.length);
-        console.log(lessons.length !== 0);
-        if (lessons.length !== 0) {
+    Project.find({}, function (err, projects) {
+        console.log(projects.length);
+        console.log(projects.length !== 0);
+        if (projects.length !== 0) {
             console.log("lessons exist")
-            res.send(lessons);
+            res.send(projects);
             return;
         }
-        if (lessons.length == 0) {
+        if (projects.length == 0) {
             console.log("lessons dont exist")
             for (i = 0; i <= courses.length - 1; i++) {
-                const lessonData = new Lesson(courses[i]);
-                lessonData.save();
-                //Lesson.find({}, function (err, lessons) {
-                // res.send(lessons); 
+                const projectData = new Project(courses[i]);
+                projectData.save();
+                //Project.find({}, function (err, projects) {
+                // res.send(projects); 
                 //})
             }
         }
-        res.send(lessons);
+        res.send(projects);
         if (err) {
         }
     })
@@ -465,9 +465,9 @@ app.post('/loguser', function (req, res) {
                         response.firstname = users.firstname;
                         response.lastname = users.lastname;
                         response.Validated = true;
-                        Lesson.findOne({ email: req.body.email }, function (err, lessons) {
-                            if (lessons) {
-                                response.Projects = lessons.Projects;
+                        Project.findOne({ email: req.body.email }, function (err, projects) {
+                            if (projects) {
+                                response.Projects = projects.Projects;
                             }
 
                         })

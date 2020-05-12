@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="noteseen">
     <div class="container mt-5">
       <div class="row">
         <div class="col form-inline">
@@ -74,7 +74,8 @@ export default {
       dialog: false,
       selectednote: [],
       URL: json.URL,
-      userinfo: ""
+      userinfo: "",
+      noteseen: false
     };
   },
   beforeMount() {
@@ -146,7 +147,6 @@ export default {
       console.log(JSON.stringify(ev));
       console.log(JSON.parse(JSON.stringify(this.arrBacklog)));
       this.dialog = false;
-      alert(this.userinfo.email);
       var serversend = {
         user: this.userinfo.email,
         notedetails: this.arrBacklog
@@ -200,6 +200,9 @@ export default {
       this.dialog = true;
     },
     checkIfLoggedIn: function() {
+      if (!sessionStorage.getItem("CurrentLoggedUser")) {
+        alert("Sign In!")
+      }
       if (sessionStorage.getItem("CurrentLoggedUser")) {
         var i = JSON.parse(sessionStorage.getItem("CurrentLoggedUser"));
         var loggeduser = {
@@ -208,6 +211,7 @@ export default {
           lastname: i.lastname
         };
         this.userinfo = loggeduser;
+        this.noteseen = true;
       }
     }
   }

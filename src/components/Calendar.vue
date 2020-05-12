@@ -1,8 +1,5 @@
 <template>
   <v-app>
-    <div class="signindiv" v-if="calendarsignseen">
-      <h1 class="signhead">Sign in to see calendar</h1>
-    </div>
     <v-row v-if="calendarseen" class="fill-height">
       <v-col>
         <!-------------------------------------TOP OF THE CALENDAR--------------------------------------------------------->
@@ -151,7 +148,6 @@ export default {
     events: [],
     dialog: false,
     calendarseen: false,
-    calendarsignseen: true,
     userinfo: "",
     URL: json.URL
   }),
@@ -255,7 +251,6 @@ export default {
           console.log(JSON.parse(JSON.stringify(data)));
           alert(data.message);
         });
-        alert("hello");
         this.name = "";
         this.details = "";
         this.start = "";
@@ -411,12 +406,11 @@ export default {
         };
         this.userinfo = loggeduser;
         this.calendarseen = true;
-        this.calendarsignseen = false;
         this.getEvents();
       }
       if (!sessionStorage.getItem("CurrentLoggedUser")) {
         this.calendarseen = false;
-        this.calendarsignseen = true;
+        alert("Sign In!")
       }
     },
     beforeMount() {

@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <div>
+      <!------------------------SHOWS IF USER IS NOT LOGGED IN------------------------------------------->
       <div v-if="loginseen" class="login" id="loginform">
         <v-card class="mx-auto" max-width="344" outlined>
           <v-list-item three-line>
@@ -32,6 +33,8 @@
           </v-card-actions>
         </v-card>
       </div>
+      <!--------------------------------------------------------------------------------->
+      <!-----------------------------SHOW IF USER IS LOGGED IN----------------------------------------->
       <div v-if="LoggedInSeen">
         <h1>User Info</h1>
         <br />
@@ -50,6 +53,7 @@
           </v-card-actions>
         </v-card>
       </div>
+      <!--------------------------------------------------------------------------------->
     </div>
   </v-app>
 </template>

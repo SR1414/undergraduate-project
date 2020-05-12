@@ -1,10 +1,6 @@
 <template>
 <v-app>
   <body class="container">
-    <!--------------------------------DISPLAYS THIS DIV IF THE USER IS NOT LOGGED IN------------------------------------------------->
-    <div v-if="signseen">
-      <h1 class="signhead">Sign in to create Kaban Board</h1>
-    </div>
     <!--------------------------------------------------------------------------------->
     <!-----------------------------------HERE IS WHERE THE USERS LIST OF PROJECTS ARE DISPLAYED---------------------------------------------->
     <div v-if="kabanseen" class="container mt-5">
@@ -20,6 +16,16 @@
       <!--------------------------------------------------------------------------------->
       <!------------------------HERE ARE WHERE THE INPUTS ARE KEPT---------------------------------->
       <div class="row form-inline">
+        <div class="col form-inline">
+          <b-form-input
+            id="input-2"
+            v-model="newTask"
+            required
+            placeholder="Enter Task"
+            @keyup.enter="add"
+          ></b-form-input>
+          <v-btn color="primary" @click="add" class="ml-3">Add Task</v-btn>
+        </div>
         <b-form-input
           id="input-2"
           v-model="loadname"
@@ -37,16 +43,7 @@
         ></b-form-input>
         <v-btn color="primary" @click="save" class="ml-3">Save Project</v-btn>
         <br />
-        <div class="col form-inline">
-          <b-form-input
-            id="input-2"
-            v-model="newTask"
-            required
-            placeholder="Enter Task"
-            @keyup.enter="add"
-          ></b-form-input>
-          <v-btn color="primary" @click="add" class="ml-3">Add Task</v-btn>
-        </div>
+        
       </div>
       <!--------------------------------------------------------------------------------->
       <div class="row mt-5">
@@ -57,7 +54,6 @@
             <draggable class="list-group kanban-column" :list="arrBackLog" group="tasks">
               <div class="list-group-item" v-for="element in arrBackLog" :key="element.name">
                 {{ element.name }}
-                <v-btn color="primary" class="mr-4" @click="ShowName(element)" dark>Show Note Name</v-btn>
               </div>
             </draggable>
           </div>
@@ -132,7 +128,6 @@ export default {
       arrDone: [],
       userinfo: "",
       kabanseen: false,
-      signseen: true,
       savename: "",
       loadname: "",
       userprojectsnames: "",
@@ -192,9 +187,9 @@ export default {
           .then(response => response.json())
           .then(data => {
             console.log("Success:", data);
-            alert(data);
             alert(data.message);
             this.checkIfLoggedIn();
+            this.reRender();
           })
           .catch(error => {
             if(error){
@@ -225,22 +220,27 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
-          alert(data);
           if (data.project.length == 0) {
             alert("Project not found");
             return;
           }
+          if(data.project.length !== 0){
           console.log(data.project.ProjectContents.Done);
           this.arrBackLog = data.project.ProjectContents.Backlog;
           this.arrInProgress = data.project.ProjectContents.InProgress;
           this.arrTested = data.project.ProjectContents.Testing;
           this.arrDone = data.project.ProjectContents.Done;
+          this.reRender();
+          }
         });
     },
     ShowName(ev) {
       console.log(JSON.parse(JSON.stringify(ev)));
     },
     checkIfLoggedIn: function() {
+      if (!sessionStorage.getItem("CurrentLoggedUser")) {
+        alert("Sign In!")
+      }
       if (sessionStorage.getItem("CurrentLoggedUser")) {
         var i = JSON.parse(sessionStorage.getItem("CurrentLoggedUser"));
         var loggeduser = {
@@ -252,7 +252,6 @@ export default {
         this.LoggedInSeen = false;
         this.userinfo = loggeduser;
         this.kabanseen = true;
-        this.signseen = false;
         fetch(this.URL + "/getprojectnames", {
           method: "POST",
           // or 'PUT'
