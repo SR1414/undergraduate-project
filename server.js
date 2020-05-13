@@ -34,6 +34,132 @@ function genRandID(length) {
         tmp += availChars.charAt(Math.floor(Math.random() * availChars.length));
     return tmp;
 }
+
+
+/*------------------------------LOG & REGISTER-------------------------------------------*/
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+};
+app.post('/newuser', function (req, res) {
+    console.log(req.body)
+    var response = {
+        email: "",
+        title: "",
+        message: "",
+        AccountCreated: false
+    }
+    if (validateEmail(req.body.email)) {
+        console.log("Valid email");
+        if (req.body.password.length == 0) {
+            console.log("Please enter a password");
+            response.message = "Please enter a password";
+            response.title = "Error";
+            res.send(response);
+            return;
+        }
+        if (req.body.password.length !== 0) {
+            User.findOne({ email: req.body.email }, function (err, users) {
+                if (!users) {
+                    console.log("User does not exist");
+                    const userData = new User(req.body);
+                    userData.save();
+                    console.log("Account Created");
+                    response.message = "Email registered on new account";
+                    response.title = "Account Created";
+                    response.AccountCreated = true;
+                    response.email = req.body.email;
+                    console.log(response)
+                    res.send(response);
+                }
+                if (users) {
+                    console.log("User Already exists");
+                    response.message = "Email Already Registered to another Account"
+                    response.title = "Error";
+                    response.email = req.body.email;
+                    res.send(response);
+                }
+                if (err) {
+                    res.send(response);
+                    next();
+                }
+            })
+            return;
+        }
+    }
+    if (!validateEmail(req.body.email)) {
+        console.log("Invalid email");
+        response.message = "Invalid Email";
+        response.title = "Error";
+        res.send(response);
+        return;
+    }
+
+});
+
+app.post('/loguser', function (req, res) {
+    var response = {
+        email: "",
+        firstname: "",
+        lastname: "",
+        message: "",
+        Projects: "",
+        Validated: false
+    }
+    console.log(req.body);
+    if (!validateEmail(req.body.email)) {
+        console.log("Invalid Email");
+        response.message = "Invalid Email";
+        res.send(response);
+        return;
+    }
+    if (validateEmail(req.body.email)) {
+        console.log("Valid Email")
+        if (req.body.password == 0) {
+            response.message = "Please enter a password";
+            console.log("Please enter a password");
+            res.send(response);
+            return;
+        }
+        if (req.body.password !== 0) {
+            console.log("Valid Password")
+            User.findOne({ email: req.body.email }, function (err, users) {
+                if (!users) {
+                    console.log("No Account registered to that email");
+                    response.message = "No Account registered to that email";
+                    res.send(response);
+                    return;
+                }
+                if (users) {
+                    console.log("Account Exists");
+                    if (users.password !== req.body.password) {
+                        console.log("Incorrect Password");
+                        response.message = "Incorrect Password";
+                        res.send(response);
+                    }
+                    if (users.password == req.body.password) {
+                        console.log("Correct Password");
+                        response.email = users.email;
+                        response.message = "Login Successful";
+                        response.firstname = users.firstname;
+                        response.lastname = users.lastname;
+                        response.Validated = true;
+                        Project.findOne({ email: req.body.email }, function (err, projects) {
+                            if (projects) {
+                                response.Projects = projects.Projects;
+                            }
+
+                        })
+                        res.send(response);
+                    }
+                }
+            })
+        }
+    }
+
+});
+/*------------------------------CALENDARS------------------------------------------------*/
 app.post('/getcalendar', (req, res) => {
     console.log(req.body.email);
     Calendar.find({ user: req.body.email }, function (err, calendars) {
@@ -61,6 +187,33 @@ app.post('/addcalendar', (req, res) => {
     response.message = "Appointment Saved";
     res.send(response);
 });
+app.post('/updatecalendar', (req, res) => {
+
+    var response = {
+        message: ""
+    };
+    Calendar.updateOne({ id: req.body.selectedcalendar }, { details: req.body.update }, function (err, calendars) {
+        console.log("Updated Appointment")
+        response.message = "Updated Appointment"
+        //res.send(response);
+    });
+
+});
+app.post('/deletecalendar', (req, res) => {
+    console.log(req.body.ToDelete)
+    var response = {
+        message: ""
+    };
+    Calendar.deleteOne({ id: req.body.ToDelete }, function (err) {
+        response.message = "Deleted Appointment";
+        res.send(response);
+        console.log("Deleted Appointment")
+        if (err) return handleError(err);
+    });
+}); 
+/*------------------------------------------------------------------------------*/
+
+/*------------------------------------------TODOS-------------------------------*/
 app.post('/savetodo', (req, res) => {
     var response = {
         message: ""
@@ -121,32 +274,9 @@ app.post('/gettodo', (req, res) => {
 
     });
 });
+/*------------------------------------------------------------------------------*/
 
-app.post('/updatecalendar', (req, res) => {
-
-    var response = {
-        message: ""
-    };
-    Calendar.updateOne({ id: req.body.selectedcalendar }, { details: req.body.update }, function (err, calendars) {
-        console.log("Updated Appointment")
-        response.message = "Updated Appointment"
-        //res.send(response);
-    });
-
-});
-
-app.post('/deletecalendar', (req, res) => {
-    console.log(req.body.ToDelete)
-    var response = {
-        message: ""
-    };
-    Calendar.deleteOne({ id: req.body.ToDelete }, function (err) {
-        response.message = "Deleted Appointment";
-        res.send(response);
-        console.log("Deleted Appointment")
-        if (err) return handleError(err);
-    });
-});
+/*--------------------------------NOTES-----------------------------------------*/
 app.post('/getnotes', (req, res) => {
     console.log(req.body.user)
     var response = {
@@ -207,6 +337,8 @@ app.post('/savenote', (req, res) => {
 
     })
 })
+/*------------------------------------------------------------------------------*/
+/*------------------------------PROJECTS-----------------------------------------*/
 app.post('/saveproject', (req, res) => {
     var response = {
         message: ""
@@ -355,130 +487,6 @@ app.get('/projects', (req, res) => {
 
 
 })
-function validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-};
-app.post('/testuser', function (req, res) {
-    console.log(req.body.email);
-})
-app.post('/newuser', function (req, res) {
-    console.log(req.body)
-    var response = {
-        email: "",
-        title: "",
-        message: "",
-        AccountCreated: false
-    }
-    if (validateEmail(req.body.email)) {
-        console.log("Valid email");
-        if (req.body.password.length == 0) {
-            console.log("Please enter a password");
-            response.message = "Please enter a password";
-            response.title = "Error";
-            res.send(response);
-            return;
-        }
-        if (req.body.password.length !== 0) {
-            User.findOne({ email: req.body.email }, function (err, users) {
-                if (!users) {
-                    console.log("User does not exist");
-                    const userData = new User(req.body);
-                    userData.save();
-                    console.log("Account Created");
-                    response.message = "Email registered on new account";
-                    response.title = "Account Created";
-                    response.AccountCreated = true;
-                    response.email = req.body.email;
-                    console.log(response)
-                    res.send(response);
-                }
-                if (users) {
-                    console.log("User Already exists");
-                    response.message = "Email Already Registered to another Account"
-                    response.title = "Error";
-                    response.email = req.body.email;
-                    res.send(response);
-                }
-                if (err) {
-                    res.send(response);
-                    next();
-                }
-            })
-            return;
-        }
-    }
-    if (!validateEmail(req.body.email)) {
-        console.log("Invalid email");
-        response.message = "Invalid Email";
-        response.title = "Error";
-        res.send(response);
-        return;
-    }
-
-});
-
-app.post('/loguser', function (req, res) {
-    var response = {
-        email: "",
-        firstname: "",
-        lastname: "",
-        message: "",
-        Projects: "",
-        Validated: false
-    }
-    console.log(req.body);
-    if (!validateEmail(req.body.email)) {
-        console.log("Invalid Email");
-        response.message = "Invalid Email";
-        res.send(response);
-        return;
-    }
-    if (validateEmail(req.body.email)) {
-        console.log("Valid Email")
-        if (req.body.password == 0) {
-            response.message = "Please enter a password";
-            console.log("Please enter a password");
-            res.send(response);
-            return;
-        }
-        if (req.body.password !== 0) {
-            console.log("Valid Password")
-            User.findOne({ email: req.body.email }, function (err, users) {
-                if (!users) {
-                    console.log("No Account registered to that email");
-                    response.message = "No Account registered to that email";
-                    res.send(response);
-                    return;
-                }
-                if (users) {
-                    console.log("Account Exists");
-                    if (users.password !== req.body.password) {
-                        console.log("Incorrect Password");
-                        response.message = "Incorrect Password";
-                        res.send(response);
-                    }
-                    if (users.password == req.body.password) {
-                        console.log("Correct Password");
-                        response.email = users.email;
-                        response.message = "Login Successful";
-                        response.firstname = users.firstname;
-                        response.lastname = users.lastname;
-                        response.Validated = true;
-                        Project.findOne({ email: req.body.email }, function (err, projects) {
-                            if (projects) {
-                                response.Projects = projects.Projects;
-                            }
-
-                        })
-                        res.send(response);
-                    }
-                }
-            })
-        }
-    }
-
-});
 
 
 app.use(express.static('public'));
