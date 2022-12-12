@@ -13,7 +13,7 @@
     "bootstrap-vue": "^2.13.0",
     "core-js": "^3.6.4",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "mongoose": "^5.9.13",
     "register-service-worker": "^1.7.1",
     "roboto-fontface": "*",
